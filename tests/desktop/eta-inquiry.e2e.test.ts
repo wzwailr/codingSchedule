@@ -1,0 +1,39 @@
+import {_electron} from '@playwright/test';import {expect,test} from 'vitest';import {mkdtemp,rm,access} from 'node:fs/promises';import {join} from 'node:path';import {tmpdir} from 'node:os';import {createHash} from 'node:crypto';
+import {sendLocal} from '../../src/bridge/transport.js';import {key} from '../helpers.js';import type {ContextResult,RunHandle} from '../../src/shared/contracts.js';
+test('floating widget retains and counts down its estimate without another model reply, then applies a necessary revision',async()=>{
+ const dir=await mkdtemp(join(tmpdir(),'eta-widget-')),app=await _electron.launch({args:['dist/desktop/main.cjs','--data-dir',dir]});
+ try{
+  const page=await app.firstWindow(),endpointPath=join(dir,'endpoint.json'),credentialPath=join(dir,'connectors',createHash('sha256').update('codex-reporter').digest('hex')+'.json');
+  await page.clock.install({time:Date.now()});await page.reload();
+  await expect.poll(()=>access(endpointPath).then(()=>true).catch(()=>false),{timeout:12000}).toBe(true);
+  const send=async(operation:'begin'|'context'|'report',body:unknown)=>{const r=await sendLocal({operation,body,endpointPath,credentialPath,connectorId:'codex-reporter'});expect(r.status).toBe(200);return r.body;};
+  const {handle}=await send('begin',{idempotencyKey:key(Date.now()),title:'估时闭环任务'}) as {handle:RunHandle};
+  await page.waitForFunction(()=>document.querySelector('#summary')?.textContent?.includes('等待 agent 估时'));
+  await page.locator('#compact').hover();await page.waitForSelector('#details:not([hidden])');
+  await expect.poll(()=>page.locator('#eta-inquiry').textContent({timeout:500})).toContain('MCP 协作取件');
+  expect(await page.locator('#eta-inquiry').evaluate(e=>getComputedStyle(e).whiteSpace)).not.toBe('nowrap');
+  const context=await send('context',{handle}) as ContextResult;
+  await send('report',{handle,reportId:key(Date.now()),seq:context.nextSeq,changes:[{type:'eta.answered',requestId:context.etaQuestion!.requestId,planRevision:0,range:{minSec:180,maxSec:300},reason:'剩余开发和验证'}]});
+  await page.waitForFunction(()=>document.querySelector('#eta')?.textContent?.includes('AI 粗估'));
+  expect(await page.locator('#activity').textContent()).toBe('尚未收到具体工作事项');expect(await page.locator('#track').getAttribute('aria-valuenow')).toBeNull();
+  expect(await page.locator('#basis').textContent()).toContain('AI 最近估时');
+  const initialText=await page.locator('#eta').textContent(),counting=await send('context',{handle}) as ContextResult;await page.clock.setSystemTime(counting.snapshot.eta.asOf!+1000);await page.clock.runFor(1000);const afterOne=await page.locator('#eta').textContent();await page.clock.runFor(1000);const afterTwo=await page.locator('#eta').textContent();expect(afterOne).not.toBe(initialText);expect(afterTwo).not.toBe(afterOne);
+  await send('report',{handle,reportId:key(Date.now()),seq:context.nextSeq+1,changes:[{type:'plan.replaced',plan:{revision:1,complete:false,schedule:'unknown',steps:[]}}]});
+  const next=await send('context',{handle}) as ContextResult;
+  expect(next.etaQuestion).toBeUndefined();
+  await send('report',{handle,reportId:key(Date.now()),seq:next.nextSeq,changes:[{type:'eta.answered',requestId:next.etaUpdate!.requestId,planRevision:1,range:null,reason:'暂不修正此前估时'}]});
+  expect(await page.locator('#eta').textContent()).toContain('AI 粗估');expect(await page.locator('#eta-inquiry').textContent()).toContain('最近一次有效估时');
+  await send('report',{handle,reportId:key(Date.now()),seq:next.nextSeq+1,changes:[{type:'eta.answered',requestId:next.etaUpdate!.requestId,planRevision:1,range:{minSec:600,maxSec:600},reason:'新发现的工作量需要十分钟'}]});
+  await page.waitForFunction(()=>/剩余 (10:00|09:5\d)/.test(document.querySelector('#eta')?.textContent||''));
+  await send('report',{handle,reportId:key(Date.now()),seq:next.nextSeq+2,changes:[{type:'run.status',status:'waiting'}]});
+  await page.waitForFunction(()=>document.querySelector('#eta')?.textContent?.startsWith('计时暂停'));
+  const frozen=await page.locator('#eta').textContent();await page.waitForTimeout(1200);expect(await page.locator('#eta').textContent()).toBe(frozen);
+  await page.clock.setSystemTime(Date.now());await send('report',{handle,reportId:key(Date.now()),seq:next.nextSeq+3,changes:[{type:'run.status',status:'active'}]});
+  const resumed=await send('context',{handle}) as ContextResult;expect(resumed.etaQuestion).toBeUndefined();
+  await send('report',{handle,reportId:key(Date.now()),seq:resumed.nextSeq,changes:[{type:'plan.replaced',plan:{revision:2,complete:true,schedule:'serial',steps:[{id:'work',title:'工作已完成，等待原agent收尾',status:'completed',weight:1,evidence:'verified'}]}}]});
+  await page.waitForFunction(()=>document.querySelector('#progress')?.textContent==='计划 100% · 待收尾'&&document.querySelector('#eta')?.textContent?.includes('AI 粗估'));
+  const finishing=await send('context',{handle}) as ContextResult;
+  await send('report',{handle,reportId:key(Date.now()),seq:finishing.nextSeq,changes:[{type:'eta.answered',requestId:finishing.etaUpdate!.requestId,planRevision:2,range:{minSec:1,maxSec:2},reason:'finishing shortly'}]});
+  await page.waitForFunction(()=>document.querySelector('#eta')?.textContent?.startsWith('已超时'),{},{timeout:4500});
+ }finally{await app.close();await rm(dir,{recursive:true,force:true,maxRetries:5,retryDelay:100});}
+},35000);

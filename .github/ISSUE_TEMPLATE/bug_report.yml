@@ -1,0 +1,44 @@
+name: 缺陷反馈
+description: 提供可复现步骤和脱敏信息
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: 请使用合成任务。日志、数据库、配置、截图中的路径、身份和凭据应先脱敏。安全问题请先阅读 SECURITY.md。
+  - type: input
+    id: version
+    attributes:
+      label: 版本或提交
+      description: 填写安装包版本、构建目录对应版本或提交号。
+    validations:
+      required: true
+  - type: dropdown
+    id: runtime
+    attributes:
+      label: 程序类型
+      options:
+        - WebView2 安装版
+        - Electron 安装版
+        - Electron 便携版
+        - 源码开发运行
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: 运行环境
+      description: Windows 版本、DPI、屏幕数量，以及涉及的 Codex 或 Claude Code 版本。
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 复现步骤
+      description: 使用最小的合成任务描述操作、预期结果和实际结果。
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 脱敏证据
+      description: 可填写错误信息或局部截图，并说明频率及临时恢复方法。

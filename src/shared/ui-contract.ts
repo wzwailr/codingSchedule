@@ -1,0 +1,12 @@
+import type { RunRef, RunSnapshot } from './contracts.js';
+import type {Appearance,ScreenDensity} from './appearance.js';
+export type SnapshotUpdate = { version:1; type:'snapshots'; snapshots:RunSnapshot[] };
+export type ActivityView='work'|'execution';
+export type HealthUpdate = { version:1; type:'health'; status:'ok'|'degraded'|'offline'; message:string };
+export type WidgetRect={x:number;y:number;width:number;height:number};
+export type FoldSurface=WidgetRect&{angle:number;radii:[number,number,number,number]};
+export type FoldGeometry={bounds:WidgetRect;anchor:{x:number;y:number};scale:number;density:ScreenDensity;screenScale:number;wingScale:number;side:'left'|'right';screen:FoldSurface;wing:FoldSurface|null;hinge:WidgetRect};
+export type LayoutUpdate={type:'layout';expanded:boolean;settings:boolean;geometry:FoldGeometry;appearance:Appearance;activityView:ActivityView;resizing:boolean;edgeHidden?:{edge:'left'|'right'|'top'|'bottom';bounds:WidgetRect}|null};
+export type DesktopUpdate=SnapshotUpdate|HealthUpdate|LayoutUpdate;
+export type UiCommand = { type:'selectRun'; run:RunRef } | {type:'activityViewSet';value:ActivityView} | { type:'pinExpanded'; value:boolean } | { type:'hover';inside:boolean } | {type:'drag';phase:'start'|'move'|'end';point:{x:number;y:number}} | {type:'resize';phase:'start'|'move'|'end'|'cancel';point:{x:number;y:number}} | {type:'opacityWheel';direction:number} | {type:'appearanceSet';scale?:number;opacity?:number;commit:boolean} | { type:'appearanceReset'|'expand'|'hide'|'showFocused'|'resetPosition'|'openSettings'|'closeSettings'|'retryCollector' } | { type:'confirmVerified'; run:RunRef };
+export type SettingsCommand = {type:'setupRead'|'setupInstall'|'setupRemove'|'associationRead'} | {type:'edgeRead'} | {type:'edgeSave';enabled:boolean} | {type:'loginSave';enabled:boolean} | {type:'settingsRead'} | {type:'sourcesSave';sources:Array<{provider:'codex'|'claude';root:string;enabled:boolean}>} | {type:'integrationPreview';host:'codex'|'claude'|'generic'|'codex-hooks'|'claude-hooks';configPath:string} | {type:'integrationApply';previewId:string} | {type:'integrationRevert';receiptId:string} | {type:'linkSource'|'unlinkSource';run:RunRef;nativeRun:RunRef};

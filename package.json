@@ -1,0 +1,55 @@
+{
+  "name": "coding-schedule",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "author": "codingSchedule contributors",
+  "type": "module",
+  "description": "Local progress for AI tasks, in a desktop floating widget",
+  "main": "dist/desktop/main.cjs",
+  "engines": {
+    "node": ">=24.15.0 <25"
+  },
+  "scripts": {
+    "dev": "npm run build && electron dist/desktop/main.cjs",
+    "dev:probe": "npm run build && electron dist/probe/main.cjs --interactive",
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src tests scripts",
+    "pretest": "npm run build",
+    "test": "vitest run",
+    "test:desktop": "npm run build && vitest run tests/desktop",
+    "probe:runtime": "node scripts/probe-runtime.mjs",
+    "verify:origins": "node scripts/verify-origins.mjs",
+    "package:win": "npm run build && node scripts/distribution-notices.mjs && electron-builder --win && node scripts/release-manifest.mjs",
+    "build:webview2": "npm run build && node scripts/build-webview2.mjs",
+    "package:webview2": "npm run build:webview2 && node scripts/distribution-notices.mjs && node scripts/package-webview2.mjs",
+    "fetch:runtime": "node scripts/fetch-bridge-runtime.mjs",
+    "fetch:relay-compiler": "node scripts/fetch-relay-compiler.mjs",
+    "probe:hosts": "node scripts/probe-hosts.mjs",
+    "probe:native": "node scripts/probe-native.mjs",
+    "verify:docs": "node scripts/verify-docs.mjs",
+    "bench": "node scripts/bench.mjs",
+    "replay": "node scripts/replay.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/client": "2.4.0",
+    "@modelcontextprotocol/server": "2.4.0",
+    "jsonc-parser": "3.3.1",
+    "smol-toml": "1.9.1",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.64.1",
+    "@types/node": "24.19.2",
+    "electron": "45.0.0",
+    "electron-builder": "26.18.0",
+    "esbuild": "0.28.2",
+    "eslint": "10.13.0",
+    "globals": "17.13.0",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.0",
+    "vitest": "5.0.5"
+  }
+}

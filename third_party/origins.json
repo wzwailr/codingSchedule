@@ -1,0 +1,28 @@
+{
+  "repository": "hoangsonww/Claude-Code-Agent-Monitor",
+  "commit": "3cb22ae4a4e2ca31145351e1d73e05d0ff41f2dc",
+  "license": "MIT",
+  "entries": [
+    {
+      "path": "third_party/ccam/codex-plan-call.cjs",
+      "upstreamPath": "server/lib/codex-plan-call.js",
+      "upstreamLines": "1-51",
+      "adaptation": "CommonJS extension only; executable-call locator reused verbatim.",
+      "sha256": "e1d542f3139a61a164ef4a9d614bd6f74ac3ba25a45b7e41df351e8d4f2b9699"
+    },
+    {
+      "path": "third_party/ccam/data-literal.cjs",
+      "upstreamPath": "server/lib/task-progress.js",
+      "upstreamLines": "98-207",
+      "adaptation": "Extracted literal parser; added 1MiB input and depth 32 bounds.",
+      "sha256": "5f739f9f23ca87b35a685c13e7d886402900a9ed3759b839622cdf9da6255fe7"
+    },
+    {
+      "path": "src/adapters/common/parse.ts",
+      "upstreamPath": "server/lib/task-progress.js",
+      "upstreamLines": "364-510",
+      "adaptation": "Message-shape normalization adapted into typed observations; own task boundaries/ownership/state semantics and typed public binding accumulator. MIT notice and upstream pin retained; binding behavior verified by adapter/integration tests.",
+      "sha256": "351045434979cec53936585798c10a638e28ade072925ab823643d2843614000"
+    }
+  ]
+}

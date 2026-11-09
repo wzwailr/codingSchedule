@@ -1,0 +1,5 @@
+{"scenario":"duplicate","expected":"identical retry is acknowledged once"}
+{"scenario":"out-of-order","expected":"stale sequence is rejected"}
+{"scenario":"lost-ack","expected":"retry committed report returns duplicate"}
+{"scenario":"waiting","expected":"waiting time never advances progress"}
+{"scenario":"reopen","expected":"a new MCP process resumes context with the same handle"}

@@ -1,0 +1,23 @@
+name: 功能建议
+description: 描述场景、目标和预期行为
+title: "[Feature] "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 使用场景与问题
+      description: 描述正在做什么，以及当前操作遇到的困难。
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: 期望行为
+      description: 说明悬浮窗应显示什么、如何操作，以及涉及的 AI 工具。
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: 验收方式
+      description: 用一个具体例子描述功能完成后的结果。

@@ -1,0 +1,60 @@
+appId: local.codingSchedule
+productName: codingSchedule
+asar: true
+electronLanguages: [en-US, zh-CN, zh-TW]
+directories:
+  output: release
+files:
+  - dist/desktop/**
+  - dist/collector/**
+  - dist/renderer/**
+  - package.json
+  - '!node_modules/**'
+  - '!dist/probe/**'
+extraResources:
+  - from: LICENSE
+    to: LICENSE
+  - from: .artifacts/bridge-runtime
+    to: bridge-runtime
+    filter: [LICENSE]
+  - from: dist/bridge/main.cjs
+    to: bridge/main.cjs
+  - from: dist/bridge/mcp-relay.exe
+    to: bridge/mcp-relay.exe
+  - from: dist/bridge/mcp-relay-build.json
+    to: bridge/mcp-relay-build.json
+  - from: integrations
+    to: integrations
+  - from: third_party/licenses
+    to: third-party-licenses
+  - from: THIRD_PARTY_NOTICES.md
+    to: THIRD_PARTY_NOTICES.md
+  - from: dist/integration/remove-cli.cjs
+    to: integration/remove-cli.cjs
+  - from: dist/integration/setup-cli.cjs
+    to: integration/setup-cli.cjs
+  - from: .artifacts/distribution
+    to: dependency-notices
+  - from: docs
+    to: docs
+  - from: README.md
+    to: README.md
+  - from: third_party/origins.json
+    to: third_party/origins.json
+win:
+  target:
+    - target: zip
+      arch: [x64]
+    - target: nsis
+      arch: [x64]
+  artifactName: codingSchedule-${version}-win-${arch}-portable.${ext}
+  signAndEditExecutable: false
+nsis:
+  artifactName: codingSchedule-${version}-win-${arch}-setup.${ext}
+  oneClick: false
+  perMachine: false
+  allowElevation: false
+  allowToChangeInstallationDirectory: true
+  runAfterFinish: true
+  deleteAppDataOnUninstall: false
+  include: build/installer.nsh

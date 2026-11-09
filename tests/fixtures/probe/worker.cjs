@@ -1,0 +1,12 @@
+const { DatabaseSync } = require('node:sqlite');
+const path = process.argv[2];
+let db = new DatabaseSync(path);
+db.exec('PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL; PRAGMA foreign_keys=ON; PRAGMA busy_timeout=1000; CREATE TABLE IF NOT EXISTS probe(value INTEGER)');
+db.exec('DELETE FROM probe; INSERT INTO probe VALUES(7); BEGIN IMMEDIATE; INSERT INTO probe VALUES(99); ROLLBACK');
+const transactionRollback = db.prepare('SELECT count(*) AS n FROM probe').get().n === 1;
+db.close();
+db = new DatabaseSync(path);
+const reopenValue = db.prepare('SELECT value FROM probe').get().value;
+const sqliteVersion = db.prepare('SELECT sqlite_version() AS v').get().v;
+db.close();
+process.parentPort.postMessage({ transactionRollback, reopenValue, sqliteVersion });

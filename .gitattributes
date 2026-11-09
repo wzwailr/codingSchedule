@@ -1,0 +1,5 @@
+third_party/ccam/*.cjs text eol=lf
+third_party/ccam/*.cts text eol=lf
+src/adapters/common/parse.ts text eol=lf
+third_party/licenses/* -text
+*.png binary
