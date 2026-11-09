@@ -1,32 +1,89 @@
+<div align="center">
+
 # codingSchedule
 
-codingSchedule 是一个 Windows 任务进度悬浮窗，自动发现本机 Codex 和 Claude Code 的活动会话。悬停或点击状态屏可查看当前动作、计划和剩余时间。AI 可以通过 MCP 汇报进度与估时，窗口也会显示从会话日志观察到的活动。进度和估时缺少依据时显示未知，AI 完成与用户验收分别记录。
+### AI 在忙什么，抬眼就知道。
 
-## 试用
+给 **Codex** 和 **Claude Code** 加一块桌面任务状态屏。
 
-当前可从源码构建两个 Windows x64 未签名候选。WebView2 安装器自动检测共享运行时，自带私有 Node，并默认提供 Codex 和 Claude Code 接入。Electron 候选支持安装版和便携版。切换版本前请退出正在使用同一数据目录的悬浮窗。
+**Windows x64 · 本机运行 · MIT · 候选开发版**
 
-- [使用说明](docs/user-guide.md)包含启动、悬浮窗操作、升级和卸载。
-- [接入说明](docs/integrations.md)包含自动监测、MCP、Skill、Hook 和撤销方法。
-- [WebView2 验收记录](docs/verification/webview2-migration.md)列出安装包大小、实测范围和仍待验收的内存与原生交互。
+[产品预览](#产品预览) · [快速开始](#快速开始) · [接入说明](docs/integrations.md) · [参与开发](CONTRIBUTING.md)
 
-## 从源码构建
+</div>
 
-在 Windows x64 上使用 Node 24.15 至 24.x。将下列命令在仓库根目录执行。
+![codingSchedule 的三种形态，收起时显示进度与 ETA，展开时查看当前工作和计划，贴边后以小环扣恢复窗口](docs/images/readme-overview.png)
+
+<p align="center"><sub>画面由当前应用界面渲染，使用隔离的合成任务展示。</sub></p>
+
+把任务交给 AI 后，你可以继续做自己的事。codingSchedule 自动发现本机活动会话，把工具调用、AI 汇报的工作事项、计划和 ETA 放在同一个悬浮窗里。需要细节时悬停展开，暂时用不到就让它贴边收起。
+
+## 产品预览
+
+**收起时，一眼看状态。** 窄状态屏保留会话、进度和 ETA，可拖动、调节尺寸和不透明度。
+
+**展开后，知道在做什么。** 详情翼展示当前动作、计划步骤、更新时间和来源，可固定展开、切换活动会话。
+
+**靠近屏幕边缘，自动藏起来。** 小环扣保留状态提示，悬停或点击即可恢复。
+
+<details>
+<summary>查看深色主题</summary>
+
+![codingSchedule 深色主题，左侧为进度状态屏，右侧为当前工作、计划步骤和会话切换](docs/images/readme-dark.png)
+
+</details>
+
+## 让等待变得有数
+
+| 你想知道的 | codingSchedule 的显示方式 |
+| --- | --- |
+| 哪个任务正在运行？ | 自动发现 Codex / Claude Code 的活动会话，以「项目名称 · 会话名称」区分，支持自动跟随和手动切换。 |
+| AI 具体在忙什么？ | **工作事项**显示 AI 主动汇报的内容，**执行状态**显示观察到的工具调用等动作，两种视角可切换。 |
+| 还要等多久？ | 接收 AI 的 ETA 后持续倒计时，新估时到达时校正，模型暂时省略估时也会保留上一次有效计时。 |
+| 完成了多少？ | 展示收到的计划进度，有效估时期间可随活跃时间推进显示。等待时冻结，超时会明确提示。 |
+| 接入要配多少东西？ | 安装器默认提供 Codex / Claude Code 的 MCP、Skill、汇报规则和异步估时 Hook 配置，也可在设置中一键接入。 |
+
+原始 AI 日志按只读方式观察，已有接入配置会核对和备份。后台汇报依赖宿主与模型配合，工具卡是否可见由宿主决定。没有可靠计划或估时时显示未知，AI 报告完成后仍与人工验收分别记录。细节见[使用说明](docs/user-guide.md)。
+
+## 快速开始
+
+当前提供源码构建，环境为 **Windows x64、Node >=24.15 且 <25**。在仓库根目录执行以下命令。
 
 ```powershell
+git clone https://github.com/wzwailr/codingSchedule.git
+cd codingSchedule
 npm ci
 npm run fetch:relay-compiler
 npm run fetch:runtime
 npm run package:webview2
 ```
 
-WebView2 安装包默认输出到 `release/webview2-v1/`。使用 `npm run package:win` 可构建 Electron 安装包和便携版。两种构建的详细步骤及验收命令见[开发说明](docs/development.md)。
+WebView2 安装包生成在 `release/webview2-v1/`。运行安装包后，会检测共享 WebView2 Runtime，需要补装时通过微软引导程序联网完成，并提供双宿主接入配置。最终用户使用安装包时无需另外安装 Node。
 
-设计、历史实现和验证证据收录在[文档索引](docs/README.md)。第三方组件与归属见[第三方声明](THIRD_PARTY_NOTICES.md)。
+安装后重新连接 AI 客户端，让它加载 MCP 和汇报规则。开始一个新任务，即可观察会话活动和上报的进度。
 
-## 参与与许可
+| 构建选择 | 命令 | 产物 |
+| --- | --- | --- |
+| WebView2 候选 | `npm run package:webview2` | 安装器、私有 Node、运行环境检测。 |
+| Electron 候选 | `npm run package:win` | 安装版和便携 ZIP。 |
+| 本地开发 | `npm run dev` | 启动 Electron 开发窗口。 |
 
-项目自身代码采用 [MIT License](LICENSE)，第三方组件保留各自许可。`package.json` 的 `private` 标记用于防止误发布到 npm。参与开发见[贡献指南](CONTRIBUTING.md)，安全反馈见[安全说明](SECURITY.md)，候选改动见[更新记录](CHANGELOG.md)。
+切换版本前请先退出使用同一数据目录的旧悬浮窗。完整步骤见[开发说明](docs/development.md)，接入和撤销方法见[接入说明](docs/integrations.md)。
 
-WebView2 的完整进程树内存仍高于 220 MiB 目标，高 DPI、多屏和部分真实宿主流程仍有待验收。各项限制随[验收记录](docs/verification/webview2-migration.md)列明。
+## 当前进展
+
+项目处于候选开发阶段，Windows 构建尚未签名。
+
+- 已有活动会话发现、双翼悬浮窗、后台汇报、持续 ETA、贴边隐藏和一键接入实现。
+- WebView2 完整进程树内存仍高于 **220 MiB** 目标。
+- 高 DPI、多屏、缺少 Runtime 的干净环境和部分真实宿主流程仍有待验收。
+
+各项证据和边界随 [WebView2 验收记录](docs/verification/webview2-migration.md)与 [V1 验收矩阵](docs/verification/acceptance.md)更新。
+
+## 一起完善它
+
+欢迎反馈复现步骤、使用场景和改进建议。提交前请对日志和截图脱敏，开发约定见[贡献指南](CONTRIBUTING.md)，安全问题按[安全反馈说明](SECURITY.md)处理。
+
+[文档索引](docs/README.md) · [更新记录](CHANGELOG.md) · [第三方声明](THIRD_PARTY_NOTICES.md) · [MIT License](LICENSE)
+
+项目自身代码采用 MIT，第三方组件保留各自许可。`package.json` 的 `private` 标记用于防止误发布到 npm。
