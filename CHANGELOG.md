@@ -1,9 +1,10 @@
 # 更新记录
 
-## Unreleased
+## 0.1.0-preview.1 · 2026-11-09
 
 首次开源候选基于 Windows x64 实现。
 
+- 提供约 25.8 MB 的 WebView2 预览安装包及 SHA-256 校验文件。
 - 自动发现 Codex 和 Claude Code 活动会话，合并日志观察与 MCP 任务报告。
 - 双翼悬浮窗、贴边环扣、活动视角切换、任务进度与持续 ETA。
 - Codex / Claude 的 MCP、Skill、默认汇报规则与异步估时 Hook 接入。

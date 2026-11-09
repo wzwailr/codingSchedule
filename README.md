@@ -8,7 +8,7 @@
 
 **Windows x64 · 本机运行 · MIT · 候选开发版**
 
-[产品预览](#产品预览) · [快速开始](#快速开始) · [接入说明](docs/integrations.md) · [参与开发](CONTRIBUTING.md)
+[下载 Windows 预览版](https://github.com/wzwailr/codingSchedule/releases/tag/v0.1.0-preview.1) · [产品预览](#产品预览) · [快速开始](#快速开始) · [参与开发](CONTRIBUTING.md)
 
 </div>
 
@@ -47,7 +47,19 @@
 
 ## 快速开始
 
-当前提供源码构建，环境为 **Windows x64、Node >=24.15 且 <25**。在仓库根目录执行以下命令。
+**Windows x64 安装包约 25.8 MB**，自带私有 Node，安装时检测 WebView2 Runtime。
+
+[下载安装包](https://github.com/wzwailr/codingSchedule/releases/download/v0.1.0-preview.1/codingSchedule-WebView2-0.1.0-setup.exe) · [发行说明与 SHA-256 校验文件](https://github.com/wzwailr/codingSchedule/releases/tag/v0.1.0-preview.1)
+
+1. 退出正在使用同一数据目录的旧悬浮窗，运行安装包。
+2. 按需保留默认的 Codex / Claude Code 接入配置，然后重新连接 AI 客户端以加载 MCP 和汇报规则。
+3. 开始一个新任务，观察活动会话、当前动作和收到的进度与 ETA。
+
+这是未签名的预览版，内存和部分环境验收仍在推进。首次缺少 WebView2 Runtime 时，微软引导程序需要联网补装。详细步骤见[使用说明](docs/user-guide.md)。
+
+### 从源码构建
+
+开发环境为 **Windows x64、Node >=24.15 且 <25**。在仓库根目录执行以下命令。
 
 ```powershell
 git clone https://github.com/wzwailr/codingSchedule.git
@@ -59,8 +71,6 @@ npm run package:webview2
 ```
 
 WebView2 安装包生成在 `release/webview2-v1/`。运行安装包后，会检测共享 WebView2 Runtime，需要补装时通过微软引导程序联网完成，并提供双宿主接入配置。最终用户使用安装包时无需另外安装 Node。
-
-安装后重新连接 AI 客户端，让它加载 MCP 和汇报规则。开始一个新任务，即可观察会话活动和上报的进度。
 
 | 构建选择 | 命令 | 产物 |
 | --- | --- | --- |
