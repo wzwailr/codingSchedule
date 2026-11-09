@@ -6,9 +6,11 @@ import { resolve } from 'node:path';
 import { expect,test } from 'vitest';
 import {execFile} from 'node:child_process';
 import {promisify} from 'node:util';
+import {hoverWidget,mouseOutside} from './cursor-fixture.js';
 async function isolatedProfile(prefix:string){
  const dir=await mkdtemp(join(tmpdir(),prefix));
  await writeFile(join(dir,'position.json'),JSON.stringify({x:24,y:24}));
+ await writeFile(join(dir,'edge.json'),JSON.stringify({enabled:false}));
  return dir;
 }
 
@@ -36,7 +38,7 @@ test('production window loads real collector, safe text and single-window settin
   try{
     const page=await app.firstWindow();await page.waitForSelector('#compact');
     await expect.poll(()=>page.locator('#summary').textContent(),{timeout:10000}).toContain('Codex');
-    await page.locator('#compact').hover();await expect.poll(()=>page.locator('#details').isVisible()).toBe(true);
+    await hoverWidget(app,page);await expect.poll(()=>page.locator('#details').isVisible()).toBe(true);
     expect(await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0]!.isFocused())).toBe(false);
     expect(await page.locator('#steps').textContent()).toContain('<img src=x onerror=alert(1)>');
     expect(await page.locator('img').count()).toBe(0);
@@ -94,7 +96,7 @@ test('after four collector thread terminations local settings still offer retry 
     return app.evaluate(()=>(globalThis as unknown as {collectorForTest?:import('node:worker_threads').Worker}).collectorForTest?.threadId??-1);
   };
   try{
-    const page=await app.firstWindow();await page.locator('#compact').hover();await page.waitForSelector('#details:not([hidden])');await page.locator('#settings-button').click();await page.waitForSelector('#settings:not([hidden])');
+    const page=await app.firstWindow();await hoverWidget(app,page);await page.waitForSelector('#details:not([hidden])');await page.locator('#settings-button').click();await page.waitForSelector('#settings:not([hidden])');
     for(let i=0;i<4;i++){
       await expect.poll(threadId,{timeout:12000}).toBeGreaterThan(0);
       await app.evaluate(()=>(globalThis as unknown as {collectorForTest:import('node:worker_threads').Worker}).collectorForTest.terminate());
@@ -103,8 +105,8 @@ test('after four collector thread terminations local settings still offer retry 
     const warning=await page.locator('#health').boundingBox();expect(warning).not.toBeNull();expect(warning!.y).toBeGreaterThanOrEqual(0);expect(warning!.y+warning!.height).toBeLessThanOrEqual(await page.evaluate(()=>innerHeight));
     // Window geometry changes during preceding desktop tests. Establish an actual
     // outside-to-inside transition instead of assuming hover() starts outside.
-    await page.mouse.move(-10,-10);expect(await page.locator('#widget').evaluate(e=>e.matches(':hover'))).toBe(false);
-    await page.locator('#compact').hover();await page.waitForSelector('#details:not([hidden])');
+    await mouseOutside(app,page);expect(await page.locator('#widget').evaluate(e=>e.matches(':hover'))).toBe(false);
+    await hoverWidget(app,page);await page.waitForSelector('#details:not([hidden])');
     const settingsButton=await page.locator('#settings-button').boundingBox(),expandedWarning=await page.locator('#health').boundingBox();
     // Collector warning stays on the OLED, controls stay on the separate wing.
     expect(expandedWarning!.height).toBeGreaterThan(0);expect(settingsButton!.height).toBeGreaterThan(0);

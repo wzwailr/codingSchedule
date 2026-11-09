@@ -14,9 +14,10 @@
 
 | 范围 | 记录 |
 | --- | --- |
+| 发布 | [0.1.1 Preview 1](verification/release-0.1.1.md) |
 | 验收与性能 | [V1 验收矩阵](verification/acceptance.md)、[性能测量](verification/performance.md)、[多 MCP 内存与耐久](verification/multi-mcp-endurance.md)、[Electron 包体](verification/package-size.md)、[WebView2](verification/webview2-migration.md) |
 | 实施阶段 | [M0 技术探针](verification/m0-capabilities.md)、[阶段一、二](verification/phase-1-2.md)、[阶段三、四](verification/phase-3-4.md) |
-| 悬浮窗 | [早期紧凑条](verification/widget-redesign.md)、[双翼折屏](verification/fold-window.md)、[外观](verification/appearance.md)、[三档密度](verification/density.md)、[贴边环扣](verification/edge-ring.md) |
+| 悬浮窗 | [收起、裁剪与小圆盘修复](verification/window-interaction.md)、[四主题切换与三态截图](verification/themes.md)、[早期紧凑条](verification/widget-redesign.md)、[双翼折屏](verification/fold-window.md)、[时光舷窗](verification/porthole.md)、[外观](verification/appearance.md)、[三档密度](verification/density.md)、[贴边环扣](verification/edge-ring.md) |
 | 进度与活动 | [活动会话](verification/active-sessions.md)、[会话归并与名称](verification/session-identity.md)、[活动双视角](verification/activity-views.md)、[汇报可靠性](verification/reporting-reliability.md) |
 | 估时 | [后台估时](verification/agent-eta-inquiry.md)、[持续倒计时](verification/eta-countdown.md)、[Claude 桌面 Code](verification/claude-code-real-session.md) |
 | 安装与接入 | [一键接入与 token 测量](verification/one-click-setup.md)、[接入兼容](verification/setup-compatibility.md)、[自动监测](verification/automatic-monitor.md)、[共享数据目录](verification/shared-profile.md) |

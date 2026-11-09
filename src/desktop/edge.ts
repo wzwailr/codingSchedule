@@ -1,4 +1,5 @@
 import type {FoldGeometry,WidgetRect} from '../shared/ui-contract.js';
+import {DEFAULT_THEME,edgeRadius,type WidgetTheme} from '../shared/themes.js';
 export type DockEdge='left'|'right'|'top'|'bottom';
 export function dockEdge(layout:FoldGeometry,area:WidgetRect):DockEdge|null{
  const {screen:s,bounds:b}=layout,distances:{edge:DockEdge;distance:number}[]=[{edge:'left',distance:b.x+s.x-area.x},{edge:'right',distance:area.x+area.width-b.x-s.x-s.width},{edge:'top',distance:b.y+s.y-area.y},{edge:'bottom',distance:area.y+area.height-b.y-s.y-s.height}];
@@ -10,8 +11,8 @@ export function edgeBounds(layout:FoldGeometry,area:WidgetRect,edge:DockEdge):Wi
 }
 // Match the CSS capsule; Windows needs at least 32 DIP width and 39 DIP height.
 // Horizontal tabs use 40 DIP so their actual bounds stay inside the work area.
-export function edgeShape(bounds:WidgetRect):WidgetRect[]{
- const {width,height}=bounds,radius=Math.min(width,height)/2,rects:WidgetRect[]=[];
+export function edgeShape(bounds:WidgetRect,theme:WidgetTheme=DEFAULT_THEME):WidgetRect[]{
+ const {width,height}=bounds,radius=edgeRadius(theme,width,height),rects:WidgetRect[]=[];
  for(let y=0;y<height;y++){
   const dy=Math.max(radius-y-.5,y+.5-height+radius,0),inset=Math.floor(radius-Math.sqrt(Math.max(0,radius*radius-dy*dy)));
   const row={x:inset,y,width:width-2*inset,height:1},previous=rects.at(-1);

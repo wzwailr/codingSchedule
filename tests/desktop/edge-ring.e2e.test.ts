@@ -54,7 +54,7 @@ test('OLED edge clasp preserves progress, frozen/active ETA, semantic states, fo
    const b=await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0]!.getBounds());expect([b.width,b.height]).toEqual(edge==='left'||edge==='right'?[32,64]:[64,40]);
    expect(b.x).toBeGreaterThanOrEqual(area.x);expect(b.y).toBeGreaterThanOrEqual(area.y);expect(b.x+b.width).toBeLessThanOrEqual(area.x+area.width);expect(b.y+b.height).toBeLessThanOrEqual(area.y+area.height);
    await inject(active);
-   for(const colorScheme of ['light','dark'] as const){await page.emulateMedia({colorScheme,reducedMotion:'reduce'});expect(await page.locator('#edge-tab').evaluate(e=>getComputedStyle(e).backgroundColor)).toBe('rgb(29, 45, 54)');expect(await page.locator('#edge-tab').evaluate(e=>getComputedStyle(e).transitionDuration)).toBe('0s');await page.screenshot({path:join(artifacts,edge+'-'+colorScheme+'.png')});}
+   for(const colorScheme of ['light','dark'] as const){await page.emulateMedia({colorScheme,reducedMotion:'reduce'});expect(await page.locator('#edge-tab').evaluate(e=>getComputedStyle(e).backgroundColor)).toBe(await page.locator('#compact').evaluate(e=>getComputedStyle(e).backgroundColor));expect(await page.locator('#edge-tab').evaluate(e=>getComputedStyle(e).transitionDuration)).toBe('0s');await page.screenshot({path:join(artifacts,edge+'-'+colorScheme+'.png')});}
    if(process.platform==='win32'){
     const native=await app.evaluate(({BrowserWindow})=>({owner:process.pid,handle:Number(BrowserWindow.getAllWindows()[0]!.getNativeWindowHandle().readBigUInt64LE())}));
     const points=[{name:'corner',x:0,y:0},{name:'center',x:b.width/2,y:b.height/2}];

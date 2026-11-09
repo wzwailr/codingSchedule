@@ -4,7 +4,8 @@ import {mountAssociation} from './association-controls.js';
 import {normalizeAppearance,MIN_SCALE,MAX_SCALE,type Appearance} from '../shared/appearance.js';
 import {syncAppearanceSettings} from './appearance-controls.js';
 import {mountSetup} from './setup-controls.js';
-type Data={appearance:Appearance;effectiveScale:number;login:{available:boolean;enabled:boolean};sources:Array<{provider:'codex'|'claude';root:string;enabled:boolean}>;configPaths:Record<string,string>;receipts:Array<{id:string;path:string}>;nativeSources:Array<{run:RunRef;provider:string;nativeSessionId:string;turnId:string;completeReplay:boolean}>};
+import {THEMES,normalizeTheme,isWidgetTheme,type WidgetTheme} from '../shared/themes.js';
+type Data={theme?:WidgetTheme;appearance:Appearance;effectiveScale:number;login:{available:boolean;enabled:boolean};sources:Array<{provider:'codex'|'claude';root:string;enabled:boolean}>;configPaths:Record<string,string>;receipts:Array<{id:string;path:string}>;nativeSources:Array<{run:RunRef;provider:string;nativeSessionId:string;turnId:string;completeReplay:boolean}>};
 let associationUpdate:ReturnType<typeof mountAssociation>|undefined;
 export function syncAssociations(snapshots:RunSnapshot[]){associationUpdate?.(snapshots);}
 export async function mountSettings(container:HTMLElement,dispatch:(command:UiCommand|SettingsCommand)=>Promise<unknown>,snapshots:RunSnapshot[],preserveAdvanced=false):Promise<void>{
@@ -31,6 +32,15 @@ export async function mountSettings(container:HTMLElement,dispatch:(command:UiCo
     const edgeLabel=document.createElement('label'),edgeInput=document.createElement('input');edgeInput.type='checkbox';edgeInput.id='edge-auto-hide';edgeInput.checked=(await dispatch({type:'edgeRead'}) as {enabled:boolean}).enabled;edgeLabel.append(edgeInput,' 靠近屏幕边缘时自动隐藏');appearanceSection.append(edgeLabel);edgeInput.onchange=()=>{edgeInput.disabled=true;void dispatch({type:'edgeSave',enabled:edgeInput.checked}).catch(()=>{edgeInput.checked=!edgeInput.checked;status('贴边隐藏设置未保存，请重试。');}).finally(()=>{edgeInput.disabled=false;});};
     q<HTMLInputElement>('appearance-scale').value=String(Math.round(initial.scale*100));
     const status=(text:string)=>{q('settings-status').textContent=text;};
+    const themeSection=document.createElement('section');themeSection.id='theme-settings';
+    themeSection.innerHTML='<h2>悬浮窗主题</h2><label for="widget-theme">显示样式</label><select id="widget-theme"></select><p id="theme-description" class="muted"></p>';
+    const themeSelect=themeSection.querySelector<HTMLSelectElement>('#widget-theme')!,themeDescription=themeSection.querySelector<HTMLElement>('#theme-description')!;
+    let selectedTheme=normalizeTheme(data.theme);
+    for(const [id,definition] of Object.entries(THEMES)){const option=document.createElement('option');option.value=id;option.textContent=definition.label;themeSelect.append(option);}
+    const syncTheme=()=>{themeSelect.value=selectedTheme;themeDescription.textContent=THEMES[selectedTheme].description+' 主题会自动记住。';};
+    syncTheme();container.prepend(themeSection);
+    themeSelect.onchange=()=>{const next=themeSelect.value;if(!isWidgetTheme(next))return;themeSelect.disabled=true;
+      void dispatch({type:'themeSet',value:next}).then(()=>{selectedTheme=next;syncTheme();status('已切换为'+THEMES[next].label+'。');}).catch(()=>{syncTheme();status('主题未保存，请重试。');}).finally(()=>{themeSelect.disabled=false;});};
     async function action(button:HTMLButtonElement,fn:()=>Promise<void>){button.disabled=true;try{await fn();}catch{status('操作未完成，请检查路径、权限或任务状态后重试。');}finally{button.disabled=false;}}
     const scale=q<HTMLInputElement>('appearance-scale'),opacity=q<HTMLInputElement>('appearance-opacity');
     const changeAppearance=async(value:{scale?:number;opacity?:number},commit:boolean)=>{const result=await dispatch({type:'appearanceSet',...value,commit}) as {appearance:Appearance;effectiveScale:number};syncAppearanceSettings(container,result.appearance,result.effectiveScale);if(commit&&value.scale!==undefined)scale.value=String(Math.round(result.appearance.scale*100));};

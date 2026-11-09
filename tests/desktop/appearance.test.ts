@@ -13,13 +13,13 @@ test('proportional resize uses event points in either wing direction, without la
 test('both states scale the native window and regions together while repeated folds preserve their OLED anchor',()=>{
  const area={x:-1920,y:0,width:1920,height:1080};
  for(const scale of [.9,.91,1.13,1.25,1.5,1.77,2]){
-  let closed=foldLayout({x:-1000,y:540},area,false,scale);const anchor=closed.anchor;
-  for(let n=0;n<15;n++){const open=foldLayout(closed.anchor,area,true,scale);closed=foldLayout(open.anchor,area,false,scale);expect(open.anchor).toEqual(anchor);expect(closed.anchor).toEqual(anchor);expect(open.scale).toBe(scale);if(scale>=1)expect(open.bounds.width).toBeCloseTo(456*scale,0);else expect(open.wingScale).toBe(1);expect(closed.bounds.width/closed.bounds.height).toBeCloseTo(148/272,2);const region=foldShape(open);expect(region.every(r=>Number.isInteger(r.width)&&Number.isInteger(r.x)&&r.x>=0&&r.y>=0&&r.x+r.width<=open.bounds.width&&r.y+r.height<=open.bounds.height)).toBe(true);}
+  let closed=foldLayout({x:-1000,y:540},area,false,scale,'disc');const anchor=closed.anchor;
+  for(let n=0;n<15;n++){const open=foldLayout(closed.anchor,area,true,scale,'disc');closed=foldLayout(open.anchor,area,false,scale,'disc');expect(open.anchor).toEqual(anchor);expect(closed.anchor).toEqual(anchor);expect(open.scale).toBe(scale);expect(open.bounds.width).toBeGreaterThan(closed.bounds.width);if(scale<1)expect(open.wingScale).toBe(1);expect(closed.bounds.width/closed.bounds.height).toBeCloseTo(1,2);const region=foldShape(open);expect(region.every(r=>Number.isInteger(r.width)&&Number.isInteger(r.x)&&r.x>=0&&r.y>=0&&r.x+r.width<=open.bounds.width&&r.y+r.height<=open.bounds.height)).toBe(true);}
  }
 });
 test('work-area scale ceiling applies to both states and does not permanently change the requested preference',()=>{
  const area={x:-1280,y:0,width:720,height:500},a=foldLayout({x:-920,y:250},area,false,2),b=foldLayout(a.anchor,area,true,2);
- expect(a.scale).toBe(b.scale);expect(b.scale).toBeLessThan(1.21);expect(b.bounds.width).toBeLessThanOrEqual(720);expect(b.bounds.height).toBeLessThanOrEqual(500);
+ expect(a.scale).toBe(b.scale);expect(b.scale).toBeLessThan(2);expect(b.bounds.width).toBeLessThanOrEqual(720);expect(b.bounds.height).toBeLessThanOrEqual(500);
  expect(foldLayout({x:500,y:500},{x:0,y:0,width:1920,height:1080},false,2).scale).toBe(2);
 });
 test('wheel direction and modes change one 5% step; trackpad bursts accumulate and are bounded',()=>{

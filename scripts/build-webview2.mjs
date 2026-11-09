@@ -38,4 +38,4 @@ await copyFile(join(sdk, 'build/native/x64/WebView2Loader.dll'), join(out, 'WebV
 for (const name of ['LICENSE.txt', 'NOTICE.txt']) await copyFile(join(sdk, name), join(out, `WebView2-${name}`));
 await build({ entryPoints: ['src/webview2/main.ts'], outfile: join(out, 'main.cjs'), bundle: true, platform: 'node', format: 'cjs', target: 'node24', mainFields: ['module', 'main'] });
 await build({ entryPoints: ['src/webview2/renderer.ts'], outfile: join(out, 'renderer/app.js'), bundle: true, platform: 'browser', format: 'iife', target: 'chrome120' });
-for (const name of ['index.html', 'styles.css']) await copyFile(join('src/renderer', name), join(out, 'renderer', name));
+for (const name of ['index.html', 'styles.css', 'themes.css']) await copyFile(join('src/renderer', name), join(out, 'renderer', name));

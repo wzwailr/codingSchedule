@@ -11,6 +11,6 @@ for (const entry of ['desktop/main','desktop/preload','collector/main','bridge/m
 }
 await build({entryPoints:['src/integration/setup-cli.ts'],outfile:'dist/integration/setup-cli.cjs',bundle:true,platform:'node',format:'cjs',target:'node24',mainFields:['module','main']});
 await mkdir('dist/renderer',{recursive:true});
-for(const name of ['index.html','styles.css'])await copyFile('src/renderer/'+name,'dist/renderer/'+name);
+for(const name of ['index.html','styles.css','themes.css'])await copyFile('src/renderer/'+name,'dist/renderer/'+name);
 await build({entryPoints:['src/renderer/app.ts'],outfile:'dist/renderer/app.js',bundle:true,platform:'browser',format:'iife',target:'chrome145'});
 console.log('Built production widget, collector and isolated capability sample.');

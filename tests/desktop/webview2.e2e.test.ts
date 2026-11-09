@@ -33,7 +33,9 @@ test.skipIf(process.platform !== 'win32' || !fixture)('WebView2 installs both AI
   await writeFile(join(profile, '.codex/config.toml'), original);
   await writeFile(join(data, 'position.json'), JSON.stringify({ anchor: { x: 420, y: 380 } }));
   await exec(join(bundle, 'win-unpacked/codingSchedule-webview2.exe'), ['--probe-runtime', '--data-dir', join(isolated, 'runtime-probe')], { env, windowsHide: true, timeout: 25000 });
-  const installer = join(bundle, 'codingSchedule-WebView2-0.1.0-test.exe');
+  const manifest = JSON.parse(await readFile(join(bundle, 'manifest.json'), 'utf8'));
+  expect(manifest.testing).toBe(true);
+  const installer = join(bundle, `codingSchedule-WebView2-${manifest.version}-test.exe`);
   const installArgs = ['/S', `/D=${install}`];
   const installOnce = () => exec(installer, installArgs, { env, windowsVerbatimArguments: true, windowsHide: true, timeout: 90000 })
     .catch((error: NodeJS.ErrnoException) => { throw new Error(`Isolated installer exited ${error.code ?? 'unknown'}`); });

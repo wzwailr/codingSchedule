@@ -1,3 +1,4 @@
+import {hoverWidget} from './cursor-fixture.js';
 import {_electron} from '@playwright/test';
 import {expect,test} from 'vitest';
 import {mkdtemp,writeFile,appendFile,rm,mkdir} from 'node:fs/promises';
@@ -14,6 +15,7 @@ test('new sessions appear without MCP reports, old turns stay hidden, closed sel
  const history=stamp({type:'session_meta',payload:{id:'history-session',cwd:'D:\\work\\历史项目'}},true)+Array.from({length:40},(_,i)=>turn('old-'+i,true)+stamp({type:'event_msg',payload:{type:'task_complete'}},true)).join('');
  await writeFile(join(logs,'history.jsonl'),history);await writeFile(join(dir,'settings.json'),JSON.stringify({sources:[{provider:'codex',root:logs,enabled:true},{provider:'claude',root:logs,enabled:true}]}));
  await writeFile(join(dir,'view.json'),JSON.stringify({activityView:'execution'}));
+ await writeFile(join(dir,'position.json'),JSON.stringify({anchor:{x:700,y:400}}));
  const exe=process.env.SCHEDULE_TEST_PACKAGE_DIR;
  const app=await _electron.launch({...(exe?{executablePath:resolve(exe,'codingSchedule.exe')}:{}),args:exe?['--data-dir',dir]:['dist/desktop/main.cjs','--data-dir',dir]});
  try{
@@ -25,7 +27,7 @@ test('new sessions appear without MCP reports, old turns stay hidden, closed sel
   expect(await page.locator('#progress').textContent()).toBe('进度未知');
   await appendFile(a,stamp({type:'response_item',payload:{type:'function_call',name:'exec_command',call_id:'work',arguments:'{}'}}));
   await expect.poll(()=>page.locator('#activity').textContent()).toBe('执行命令');
-  await page.locator('#compact').hover();await page.waitForSelector('#details:not([hidden])');await page.locator('#pin').click();
+  await hoverWidget(app,page);await page.waitForSelector('#details:not([hidden])');await page.locator('#pin').click();
   const b=join(logs,'new-claude.jsonl');await writeFile(b,stamp({type:'user',sessionId:'session-33334444',uuid:'b',cwd:'D:\\work\\产品B',message:{content:'go'}})+stamp({type:'assistant',sessionId:'session-33334444',message:{content:[{type:'tool_use',id:'read',name:'Read',input:{}}]}}));
   await expect.poll(()=>page.locator('#tasks option').count(),{timeout:7000}).toBe(2);
   await appendFile(b,stamp({type:'custom-title',sessionId:'session-33334444',customTitle:'Claude会话'}));

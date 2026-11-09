@@ -9,7 +9,8 @@ test('three tiers physically shrink while readable details, controls and origina
    await page.evaluate(scale=>window.schedule.dispatchUiCommand({type:'appearanceSet',scale,commit:true}),scale);await expect.poll(()=>page.locator('#widget').getAttribute('data-density')).toBe(density);
    const bounds=await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0]!.getBounds());if(scale===.35)expect([bounds.width,bounds.height]).toEqual([68,92]);
    expect(await page.locator('#resize-compact').evaluate(e=>e.getBoundingClientRect().width)).toBeGreaterThanOrEqual(19.9);
-   expect(await page.locator('#screen-progress').evaluate(e=>e.getBoundingClientRect().height)).toBeGreaterThanOrEqual(20);
+   // The normal tier starts at 75%: its 25px line box is at least 18.75 DIP.
+   expect(await page.locator('#screen-progress').evaluate(e=>e.getBoundingClientRect().height)).toBeGreaterThanOrEqual(18.7);
    if(scale<.75){const feedback=await page.locator('#appearance-feedback').boundingBox(),eta=await page.locator('#screen-eta').boundingBox();expect(feedback!.y).toBeGreaterThanOrEqual(eta!.y+eta!.height);}
    await page.evaluate(()=>window.schedule.dispatchUiCommand({type:'expand'}));await page.waitForSelector('#details:not([hidden])');
    expect(await page.locator('#widget').getAttribute('data-scale')).toBe(String(scale));expect(await page.locator('#settings-button').evaluate(e=>e.getBoundingClientRect().height)).toBeGreaterThanOrEqual(24);

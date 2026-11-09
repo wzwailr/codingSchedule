@@ -27,7 +27,7 @@ function start() {
   protocol.handle('schedule', request => {
     const url = new URL(request.url);
     const file = url.pathname.slice(1) || 'index.html';
-    if (url.host !== 'widget' || !['index.html', 'app.js', 'styles.css'].includes(file)) return new Response('Not found', { status: 404 });
+    if (url.host !== 'widget' || !['index.html', 'app.js', 'styles.css', 'themes.css'].includes(file)) return new Response('Not found', { status: 404 });
     return net.fetch(pathToFileURL(join(__dirname, '../renderer', file)).toString());
   });
   const platform: DesktopPlatform = {

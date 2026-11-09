@@ -28,7 +28,7 @@ for (const name of ['codingSchedule-webview2.exe', 'WebView2Loader.dll', 'WebVie
 include('dist/webview2/main.cjs', 'resources/webview2/main.cjs');
 for (const name of ['node.exe', 'LICENSE']) include(join(nodeDir, name), `resources/bridge-runtime/${name}`);
 for (const name of ['collector/main.cjs', 'bridge/main.cjs', 'bridge/mcp-relay.exe', 'integration/setup-cli.cjs', 'integration/remove-cli.cjs']) include(join('dist', name), `resources/${name}`);
-for (const name of ['index.html', 'styles.css', 'app.js']) include(join('dist/webview2/renderer', name), `resources/renderer/${name}`);
+for (const name of ['index.html', 'styles.css', 'themes.css', 'app.js']) include(join('dist/webview2/renderer', name), `resources/renderer/${name}`);
 for (const name of ['skill/SKILL.md', 'reporting-rule.md', 'hooks/common.cjs', 'hooks/codex.cjs', 'hooks/claude.cjs']) include(join('integrations', name), `resources/integrations/${name}`);
 for (const name of (await readdir('third_party/licenses')).filter(name => name.endsWith('.txt'))) include(join('third_party/licenses', name), `resources/third-party-licenses/${name}`);
 const notices = '.artifacts/distribution';

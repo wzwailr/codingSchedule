@@ -8,7 +8,7 @@
 
 **Windows x64 · 本机运行 · MIT · 候选开发版**
 
-[下载 Windows 预览版](https://github.com/wzwailr/codingSchedule/releases/tag/v0.1.0-preview.1) · [产品预览](#产品预览) · [快速开始](#快速开始) · [参与开发](CONTRIBUTING.md)
+[下载 Windows 预览版](https://github.com/wzwailr/codingSchedule/releases/tag/v0.1.1-preview.1) · [产品预览](#产品预览) · [快速开始](#快速开始) · [参与开发](CONTRIBUTING.md)
 
 </div>
 
@@ -19,6 +19,16 @@
 把任务交给 AI 后，你可以继续做自己的事。codingSchedule 自动发现本机活动会话，把工具调用、AI 汇报的工作事项、计划和 ETA 放在同一个悬浮窗里。需要细节时悬停展开，暂时用不到就让它贴边收起。
 
 ## 产品预览
+
+**四种外观，同一份任务。** 默认保留双翼状态屏，也可以换成像素终端、金属仪表或冰蓝圆盘。每套都覆盖收起、展开和贴边，切换后保留进度与倒计时，重启记住选择。
+
+| 时光舷窗 | 像素终端 |
+| --- | --- |
+| ![时光舷窗收起状态](docs/assets/themes/porthole-collapsed.png) | ![像素终端收起状态](docs/assets/themes/terminal-collapsed.png) |
+| 银砂仪表 | 冷银冰蓝 |
+| ![银砂仪表收起状态](docs/assets/themes/silver-collapsed.png) | ![冷银冰蓝收起状态](docs/assets/themes/disc-collapsed.png) |
+
+<p align="center"><sub>应用隔离窗口实拍，使用合成任务；更多展开与贴边效果见<a href="docs/verification/themes.md">主题展示</a>。</sub></p>
 
 **收起时，一眼看状态。** 窄状态屏保留会话、进度和 ETA，可拖动、调节尺寸和不透明度。
 
@@ -49,7 +59,7 @@
 
 **Windows x64 安装包约 25.8 MB**，自带私有 Node，安装时检测 WebView2 Runtime。
 
-[下载安装包](https://github.com/wzwailr/codingSchedule/releases/download/v0.1.0-preview.1/codingSchedule-WebView2-0.1.0-setup.exe) · [发行说明与 SHA-256 校验文件](https://github.com/wzwailr/codingSchedule/releases/tag/v0.1.0-preview.1)
+[下载安装包](https://github.com/wzwailr/codingSchedule/releases/download/v0.1.1-preview.1/codingSchedule-WebView2-0.1.1-setup.exe) · [发行说明与 SHA-256 校验文件](https://github.com/wzwailr/codingSchedule/releases/tag/v0.1.1-preview.1)
 
 1. 退出正在使用同一数据目录的旧悬浮窗，运行安装包。
 2. 按需保留默认的 Codex / Claude Code 接入配置，然后重新连接 AI 客户端以加载 MCP 和汇报规则。
@@ -84,7 +94,7 @@ WebView2 安装包生成在 `release/webview2-v1/`。运行安装包后，会检
 
 项目处于候选开发阶段，Windows 构建尚未签名。
 
-- 已有活动会话发现、双翼悬浮窗、后台汇报、持续 ETA、贴边隐藏和一键接入实现。
+- 已有活动会话发现、四套悬浮窗主题、后台汇报、持续 ETA、贴边隐藏和一键接入实现。
 - WebView2 完整进程树内存仍高于 **220 MiB** 目标。
 - 高 DPI、多屏、缺少 Runtime 的干净环境和部分真实宿主流程仍有待验收。
 

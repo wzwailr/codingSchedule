@@ -1,7 +1,8 @@
-import {_electron} from '@playwright/test';import {expect,test} from 'vitest';import {mkdtemp,rm,access} from 'node:fs/promises';import {join} from 'node:path';import {tmpdir} from 'node:os';import {createHash} from 'node:crypto';
+import {hoverWidget} from './cursor-fixture.js';
+import {_electron} from '@playwright/test';import {expect,test} from 'vitest';import {mkdtemp,rm,access,writeFile} from 'node:fs/promises';import {join} from 'node:path';import {tmpdir} from 'node:os';import {createHash} from 'node:crypto';
 import {sendLocal} from '../../src/bridge/transport.js';import {key} from '../helpers.js';import type {ContextResult,RunHandle} from '../../src/shared/contracts.js';
 test('floating widget retains and counts down its estimate without another model reply, then applies a necessary revision',async()=>{
- const dir=await mkdtemp(join(tmpdir(),'eta-widget-')),app=await _electron.launch({args:['dist/desktop/main.cjs','--data-dir',dir]});
+ const dir=await mkdtemp(join(tmpdir(),'eta-widget-'));await writeFile(join(dir,'position.json'),JSON.stringify({anchor:{x:700,y:400}}));const app=await _electron.launch({args:['dist/desktop/main.cjs','--data-dir',dir]});
  try{
   const page=await app.firstWindow(),endpointPath=join(dir,'endpoint.json'),credentialPath=join(dir,'connectors',createHash('sha256').update('codex-reporter').digest('hex')+'.json');
   await page.clock.install({time:Date.now()});await page.reload();
@@ -9,7 +10,7 @@ test('floating widget retains and counts down its estimate without another model
   const send=async(operation:'begin'|'context'|'report',body:unknown)=>{const r=await sendLocal({operation,body,endpointPath,credentialPath,connectorId:'codex-reporter'});expect(r.status).toBe(200);return r.body;};
   const {handle}=await send('begin',{idempotencyKey:key(Date.now()),title:'估时闭环任务'}) as {handle:RunHandle};
   await page.waitForFunction(()=>document.querySelector('#summary')?.textContent?.includes('等待 agent 估时'));
-  await page.locator('#compact').hover();await page.waitForSelector('#details:not([hidden])');
+  await hoverWidget(app,page);await page.waitForSelector('#details:not([hidden])');
   await expect.poll(()=>page.locator('#eta-inquiry').textContent({timeout:500})).toContain('MCP 协作取件');
   expect(await page.locator('#eta-inquiry').evaluate(e=>getComputedStyle(e).whiteSpace)).not.toBe('nowrap');
   const context=await send('context',{handle}) as ContextResult;

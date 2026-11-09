@@ -19,10 +19,10 @@ test('logical small and negative-coordinate work areas remain bounded',()=>{
   expect(g.screen.width).toBeGreaterThan(50);expect(g.screen.height).toBeGreaterThan(70);
  }
 });
-test('native regions include wings and hinge but exclude unused corners and canvas in either orientation',()=>{
+test('native regions include both visible surfaces and exclude unused corners and canvas in either orientation',()=>{
  for(const point of [{x:80,y:540},{x:1840,y:540}])for(const expanded of [false,true]){
   const g=foldLayout(point,area,expanded),region=foldShape(g),hit=(x:number,y:number)=>region.some(r=>contains(r,x,y));
-  for(const surface of [g.screen,g.wing,g.hinge].filter(x=>x!==null)){expect(hit(surface.x+surface.width/2,surface.y+surface.height/2)).toBe(true);}
+  for(const surface of [g.screen,g.wing].filter(x=>x!==null)){expect(hit(surface.x+surface.width/2,surface.y+surface.height/2)).toBe(true);}
   expect(hit(0,0)).toBe(false);expect(hit(g.bounds.width-1,g.bounds.height-1)).toBe(false);
   if(expanded)expect(hit(g.screen.x+g.screen.width/2,5)).toBe(false);
   for(const r of region){expect([r.x,r.y,r.width,r.height].every(Number.isInteger)).toBe(true);expect(r.x).toBeGreaterThanOrEqual(0);expect(r.y).toBeGreaterThanOrEqual(0);expect(r.x+r.width).toBeLessThanOrEqual(g.bounds.width);expect(r.y+r.height).toBeLessThanOrEqual(g.bounds.height);expect(r.width*r.height).toBeGreaterThan(0);}

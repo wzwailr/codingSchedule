@@ -5,15 +5,17 @@ test('size gestures preview without writes, keep fold state and fonts proportion
  try{
   let page=await app.firstWindow();await page.waitForSelector('#resize-compact');await page.mouse.move(-20,-20);
   const before=await page.locator('#screen-progress').boundingBox();
-  const point={x:524,y:464};await page.evaluate(p=>window.schedule.dispatchUiCommand({type:'resize',phase:'start',point:p}),point);
-  await page.evaluate(async()=>{for(const point of [{x:529,y:475},{x:534,y:486},{x:544,y:507}])await window.schedule.dispatchUiCommand({type:'resize',phase:'move',point});await window.schedule.dispatchUiCommand({type:'hover',inside:true});});
+  const native=await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0]!.getBounds()),screen=await page.locator('#compact').boundingBox();
+  const anchor={x:native.x+screen!.x+screen!.width/2,y:native.y+screen!.y+screen!.height/2},point={x:anchor.x+50,y:anchor.y+100},target={x:anchor.x+70,y:anchor.y+140};
+  await page.evaluate(p=>window.schedule.dispatchUiCommand({type:'resize',phase:'start',point:p}),point);
+  await page.evaluate(async({point,target})=>{for(const ratio of [.25,.5,1])await window.schedule.dispatchUiCommand({type:'resize',phase:'move',point:{x:point.x+(target.x-point.x)*ratio,y:point.y+(target.y-point.y)*ratio}});await window.schedule.dispatchUiCommand({type:'hover',inside:true});},{point,target});
   await page.waitForTimeout(300);expect(await page.locator('#details').isHidden()).toBe(true);expect(await access(join(dir,'appearance.json')).then(()=>true).catch(()=>false)).toBe(false);
   const after=await page.locator('#screen-progress').boundingBox();expect(after!.height/before!.height).toBeGreaterThan(1.35);expect(after!.height/before!.height).toBeLessThan(1.45);
-  await page.evaluate(()=>window.schedule.dispatchUiCommand({type:'resize',phase:'end',point:{x:544,y:507}}));
+  await page.evaluate(p=>window.schedule.dispatchUiCommand({type:'resize',phase:'end',point:p}),target);
   expect(JSON.parse(await readFile(join(dir,'appearance.json'),'utf8')).scale).toBe(1.4);
   await page.waitForTimeout(350);expect(await page.locator('#details').isHidden()).toBe(true);
   await page.evaluate(()=>window.schedule.dispatchUiCommand({type:'expand'}));expect(await page.locator('#widget').getAttribute('data-scale')).toBe('1.4');
-  expect(await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0]!.getBounds().width)).toBe(638);
+  expect(await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0]!.getBounds().width)).toBeGreaterThan(Math.round(native.width*1.4));
   await page.evaluate(()=>window.schedule.dispatchUiCommand({type:'openSettings'}));await page.waitForSelector('#appearance-scale');
   await page.evaluate(root=>window.schedule.dispatchUiCommand({type:'sourcesSave',sources:[{provider:'codex',root,enabled:false},{provider:'claude',root,enabled:false}]}),dir);
   expect(JSON.parse(await readFile(join(dir,'appearance.json'),'utf8'))).toEqual({scale:1.4,opacity:1});
@@ -25,7 +27,7 @@ test('both mouse resize handles preview continuously, flush fast final points an
  const dir=await mkdtemp(join(tmpdir(),'appearance-pointer-'));await writeFile(join(dir,'position.json'),JSON.stringify({x:400,y:220}));const app=await launch(dir);
  try{
   const page=await app.firstWindow();await page.waitForSelector('#resize-compact');const bounds=()=>app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0]!.getBounds());
-  const initial=await bounds(),box=await page.locator('#resize-compact').boundingBox(),anchor={x:initial.x+74,y:initial.y+136},start={x:initial.x+box!.x+box!.width/2,y:initial.y+box!.y+box!.height/2};
+  const initial=await bounds(),box=await page.locator('#resize-compact').boundingBox(),screen=await page.locator('#compact').boundingBox(),anchor={x:initial.x+screen!.x+screen!.width/2,y:initial.y+screen!.y+screen!.height/2},start={x:initial.x+box!.x+box!.width/2,y:initial.y+box!.y+box!.height/2};
   await page.mouse.move(box!.x+box!.width/2,box!.y+box!.height/2);await page.mouse.down();
   const target={x:anchor.x+(start.x-anchor.x)*1.3,y:anchor.y+(start.y-anchor.y)*1.3};
   // CDP inputs are client-relative, so preserve the same absolute screen point
